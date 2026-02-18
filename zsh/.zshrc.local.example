@@ -1,0 +1,40 @@
+# ===========================================
+# Machine-specific settings (.zshrc.local)
+# ===========================================
+# This file is NOT tracked by git.
+# Copy this to ~/.zshrc.local and edit for your machine.
+
+# --- macOS ---
+
+# Homebrew
+# export PATH=/opt/homebrew/bin:$PATH
+
+# Java (Android development)
+# export JAVA_HOME="/opt/homebrew/opt/openjdk@17"
+# export PATH="$JAVA_HOME/bin:$PATH"
+
+# Android SDK
+# export PATH=$PATH:~/Library/Android/sdk/platform-tools
+
+# Windsurf
+# export PATH="/Users/$USER/.codeium/windsurf/bin:$PATH"
+
+# Kiro CLI
+# [[ -f "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.pre.zsh" ]] && builtin source "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.pre.zsh"
+# [[ -f "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh"
+
+# Claude CLI
+# export PATH="$HOME/.local/bin:$PATH"
+# [[ -f "$HOME/.local/bin/env" ]] && . "$HOME/.local/bin/env"
+
+# Task Master aliases
+# alias tm='task-master'
+# alias taskmaster='task-master'
+
+# --- Linux ---
+
+# Linuxbrew
+# eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
+# Snap
+# export PATH="/snap/bin:$PATH"
