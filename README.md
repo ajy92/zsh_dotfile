@@ -52,6 +52,33 @@ exec zsh
 | 4 | 기존 `~/.zshrc` 백업 후 심링크 생성 (`~/.zshrc` → `dotfiles/zsh/.zshrc`) |
 | 5 | `~/.zshrc.local`이 없으면 example에서 복사 |
 
+### 업데이트
+
+dotfiles, Oh My Zsh, 플러그인을 한 번에 최신 버전으로 업데이트합니다.
+
+```bash
+cd ~/github/dotfiles
+./bootstrap.sh update
+```
+
+### 상태 확인
+
+현재 설치 상태(branch, 플러그인, 심링크)를 확인합니다.
+
+```bash
+./bootstrap.sh status
+```
+
+### 명령어 요약
+
+| 명령 | 설명 |
+|------|------|
+| `./bootstrap.sh` | 최초 설치 (= `install`) |
+| `./bootstrap.sh install` | 최초 설치 |
+| `./bootstrap.sh update` | dotfiles + Oh My Zsh + 플러그인 업데이트 |
+| `./bootstrap.sh status` | 현재 설치 상태 확인 |
+| `./bootstrap.sh help` | 사용법 표시 |
+
 ### 포함된 플러그인
 
 - [zsh-autosuggestions](https://github.com/zsh-users/zsh-autosuggestions) — 히스토리 기반 자동 완성
@@ -85,7 +112,8 @@ Linux 예시: linuxbrew, snap 경로 등
 cd ~/github/dotfiles
 git add -A && git commit -m "chore: update zshrc" && git push
 
-# 다른 머신에서
-cd ~/github/dotfiles && git pull
+# 다른 머신에서 (dotfiles + 플러그인 모두 업데이트)
+cd ~/github/dotfiles
+./bootstrap.sh update
 # .zshrc는 심링크이므로 자동 반영
 ```
