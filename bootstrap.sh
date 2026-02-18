@@ -50,6 +50,34 @@ link_zshrc() {
   echo ".zshrc 심링크 완료"
 }
 
+link_tmux_conf() {
+  if [[ ! -f "$DOTFILES_DIR/tmux/.tmux.conf" ]]; then
+    echo ".tmux.conf 소스 파일 없음 (건너뜀)"
+    return
+  fi
+  if [[ -f "$HOME/.tmux.conf" && ! -L "$HOME/.tmux.conf" ]]; then
+    backup="$HOME/.tmux.conf.backup.$(date +%Y%m%d%H%M%S)"
+    echo "기존 .tmux.conf 백업 → $backup"
+    mv "$HOME/.tmux.conf" "$backup"
+  fi
+  ln -sf "$DOTFILES_DIR/tmux/.tmux.conf" "$HOME/.tmux.conf"
+  echo ".tmux.conf 심링크 완료"
+}
+
+install_tmux() {
+  if command -v tmux &>/dev/null; then
+    echo "tmux 이미 설치됨: $(tmux -V)"
+  else
+    echo "tmux 설치 중..."
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+      brew install tmux
+    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+      sudo apt-get update && sudo apt-get install -y tmux || sudo yum install -y tmux
+    fi
+  fi
+  link_tmux_conf
+}
+
 create_local() {
   if [[ ! -f "$HOME/.zshrc.local" ]]; then
     cp "$DOTFILES_DIR/zsh/.zshrc.local.example" "$HOME/.zshrc.local"
@@ -67,6 +95,7 @@ do_install() {
   install_zsh
   install_omz
   install_plugins
+  install_tmux
   link_zshrc
   create_local
   echo ""
@@ -81,12 +110,12 @@ do_update() {
   echo ""
 
   # dotfiles 저장소 pull
-  echo "[1/4] dotfiles 저장소 업데이트 중..."
+  echo "[1/5] dotfiles 저장소 업데이트 중..."
   git -C "$DOTFILES_DIR" pull --rebase
 
   # Oh My Zsh 업데이트
   echo ""
-  echo "[2/4] Oh My Zsh 업데이트 중..."
+  echo "[2/5] Oh My Zsh 업데이트 중..."
   if [[ -d "$HOME/.oh-my-zsh" ]]; then
     git -C "$HOME/.oh-my-zsh" pull --rebase
   else
@@ -95,7 +124,7 @@ do_update() {
 
   # 플러그인 업데이트
   echo ""
-  echo "[3/4] 플러그인 업데이트 중..."
+  echo "[3/5] 플러그인 업데이트 중..."
   for plugin in "${PLUGINS[@]}"; do
     if [[ -d "$ZSH_CUSTOM/plugins/$plugin" ]]; then
       echo "  $plugin 업데이트 중..."
@@ -108,8 +137,17 @@ do_update() {
 
   # 심링크 확인
   echo ""
-  echo "[4/4] 심링크 확인 중..."
+  echo "[4/5] 심링크 확인 중..."
   link_zshrc
+
+  echo ""
+  echo "[5/5] tmux 설정 확인 중..."
+  link_tmux_conf
+
+  # 실행 중인 tmux가 있으면 설정 리로드
+  if command -v tmux &>/dev/null && tmux list-sessions &>/dev/null; then
+    tmux source-file ~/.tmux.conf 2>/dev/null && echo "tmux 설정 리로드 완료"
+  fi
 
   echo ""
   echo "=== 업데이트 완료! ==="
@@ -140,12 +178,19 @@ do_status() {
   done
   echo ""
 
-  echo ".zshrc 심링크:"
-  if [[ -L "$HOME/.zshrc" ]]; then
-    echo "  $(ls -l "$HOME/.zshrc" | awk -F' -> ' '{print $2}')"
-  else
-    echo "  심링크 아님 (bootstrap.sh install 실행 필요)"
-  fi
+  echo "심링크:"
+  for target in .zshrc .tmux.conf; do
+    if [[ -L "$HOME/$target" ]]; then
+      echo "  $target → $(readlink "$HOME/$target")"
+    elif [[ -f "$HOME/$target" ]]; then
+      echo "  $target: 일반 파일 (심링크 아님)"
+    else
+      echo "  $target: 없음"
+    fi
+  done
+  echo ""
+
+  echo "tmux: $(command -v tmux &>/dev/null && tmux -V || echo '미설치')"
 }
 
 # --- 사용법 ---
